@@ -1,0 +1,10 @@
+[tack]
+recomposable = true
+
+[inputs.nixpkgs]
+url = "github:NixOS/nixpkgs/nixpkgs-unstable"
+type = "fetch"
+
+[inputs.now]
+url = "git+https://codeberg.org/now-runner/now.git"
+type = "fetch"

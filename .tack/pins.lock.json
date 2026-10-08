@@ -1,0 +1,18 @@
+{
+  "nixpkgs": {
+    "type": "github",
+    "owner": "NixOS",
+    "repo": "nixpkgs",
+    "rev": "39ad350a0602fa0a58a544344e3e9187526ea45c",
+    "narHash": "sha256-o0N4g6uSOIppU7CGToNvGlMf5vC+B6O6ukFHKY/TKOY=",
+    "lastModified": 1791366222
+  },
+  "now": {
+    "type": "git",
+    "url": "https://codeberg.org/now-runner/now.git",
+    "ref": "HEAD",
+    "rev": "9adf7494a36be544afadedef9058295b629359a2",
+    "narHash": "sha256-JWmQaaZ6cDRHjHq4vPc+fL15XAvoV9URn4zs/AYnVBI=",
+    "lastModified": 1791321534
+  }
+}
