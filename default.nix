@@ -1,66 +1,27 @@
-# Adapted from:
-# <https://github.com/llakala/lladios/blob/4a5e900239bc2248cd7620954090df5b4fe52b4b/adios/lib/importModules.nix>
-# SPDX: LGPL-3.0-or-later
+# now-services: A collection of now-compatible services
+# Copyright (C) 2026 Eric Rodrigues Pires
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+# more details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
 
 let
-  inherit (builtins)
-    attrNames
-    concatMap
-    head
-    listToAttrs
-    match
-    pathExists
-    readDir
-    ;
-
-  importModules =
-    dir:
-    let
-      matchNixFile = match "(.+)\\.nix$";
-
-      files = readDir dir;
-
-      result = listToAttrs (
-        concatMap (
-          name:
-          if files.${name} == "directory" then
-            if pathExists (dir + "/${name}/default.nix") then
-              [
-                {
-                  inherit name;
-                  value = import (dir + "/${name}");
-                }
-              ]
-            else
-              [ ]
-          else
-            let
-              m = matchNixFile name;
-              moduleName = head m;
-            in
-            if m != null && name != "default.nix" then
-              [
-                {
-                  name =
-                    if files ? ${moduleName} then
-                      throw ''
-                        Module ${moduleName} was provided by both:
-                        - ${dir}/${moduleName}/default.nix
-                        - ${name}
-
-                        This is ambigious. Restructure your code to not have ambigious module names.
-                      ''
-                    else
-                      moduleName;
-                  value = import (dir + "/${name}");
-                }
-              ]
-            else
-              [ ]
-        ) (attrNames files)
-      );
-    in
-    result;
+  inputs = import ./.tack;
+  adios = import inputs.adios;
+  root.modules = adios.lib.importModules {
+    directory = ./services;
+    args = adios;
+  };
+  tree = adios root { };
 in
 
-importModules ./services
+tree.modules

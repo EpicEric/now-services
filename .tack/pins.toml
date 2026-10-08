@@ -1,6 +1,10 @@
 [tack]
 recomposable = true
 
+[inputs.adios]
+url = "github:llakala/lladios"
+type = "fetch"
+
 [inputs.nixpkgs]
 url = "github:NixOS/nixpkgs/nixpkgs-unstable"
 type = "fetch"
