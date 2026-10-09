@@ -63,17 +63,17 @@
       path = [ package ];
       sandbox.enable = false;
       run = ''
-        set -euo pipefail
+        set -eo pipefail
         source ${./lib.sh}
 
         if [ -z "$REDIS_DIR" ]; then
-          start redis ${serverBinary} --port "''${REDIS_PORT:-6379}" --save "" --appendonly no
+          now_start redis ${serverBinary} --port "''${REDIS_PORT:-6379}" --save "" --appendonly no
         else
-          start redis ${serverBinary} --port "''${REDIS_PORT:-6379}" --dir "$REDIS_DIR"
+          now_start redis ${serverBinary} --port "''${REDIS_PORT:-6379}" --dir "$REDIS_DIR"
         fi
-        wait_for 30 ${cliBinary} -p "''${REDIS_PORT:-6379}" ping
+        now_wait_for 30 ${cliBinary} -p "''${REDIS_PORT:-6379}" ping
         echo "Redis is running."
-        wait_for_jobs
+        now_wait_for_jobs
       '';
     }
   );

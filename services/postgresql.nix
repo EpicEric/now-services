@@ -42,10 +42,10 @@
 
   result = promise (
     { options }:
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     let
       package' = if options ? package then options.package else pkgs.postgresql;
-      inherit (pkgs.lib) escapeShellArg;
+      inherit (lib) escapeShellArg;
     in
     {
       inherit (options) env;
@@ -55,7 +55,7 @@
       ];
       sandbox.enable = false;
       run = ''
-        set -euo pipefail
+        set -eo pipefail
         source ${./lib.sh}
 
         if [ -z "$PGDATA" ]; then
@@ -72,19 +72,19 @@
               unixSocket = escapeShellArg options.unixSocket;
             in
             ''
-              start postgres postgres -D "$PGDATA" -k ${unixSocket} -c listen_addresses=""
-              wait_for 30 pg_isready -h ${unixSocket}
+              now_start postgresql postgres -D "$PGDATA" -k ${unixSocket} -c listen_addresses=""
+              now_wait_for 30 pg_isready -h ${unixSocket}
             ''
           else
             ''
               sockdir=$(mktemp -d)
               trap 'rm -rf "$sockdir"' EXIT
-              start postgres postgres -D "$PGDATA" -k "$sockdir"
-              wait_for 30 pg_isready -h "$sockdir"
+              now_start postgresql postgres -D "$PGDATA" -k "$sockdir"
+              now_wait_for 30 pg_isready -h "$sockdir"
             ''
         }
         echo "PostgreSQL is running."
-        wait_for_jobs
+        now_wait_for_jobs
       '';
     }
   );

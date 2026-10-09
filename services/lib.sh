@@ -15,20 +15,32 @@
 # with this program. If not, see <https://www.gnu.org/licenses/>.
 
 _names=()
+_commands=()
 _pids=()
 
-# start NAME CMD...
-# Starts a process. Logs get printed with the "$name> " prefix
-start() {
-    local name=$1; shift
-    "$@" > >(sed -u "s/^/\x1B[2m$name>\x1B[0m /") 2>&1 &
-    _names+=("$name")
-    _pids+=($!)
+# Helper function to spawn a child command. Logs get printed with the "$name> " prefix.
+# Call with:
+#   _now_spawn INDEX
+_now_spawn() {
+    local i=$1 name=${_names[$1]}
+    eval "${_commands[i]}" > >(sed -u "s/^/\x1B[2m$name>\x1B[0m /") 2>&1 &
+    _pids[i]=$!
 }
 
-# wait_for TIMEOUT CMD...
+# Starts a process.
+# Call with:
+#   now_start NAME CMD...
+now_start() {
+    local name=$1; shift
+    _names+=("$name")
+    _commands+=("$(printf '%q ' "$@")")
+    _now_spawn $(( ${#_names[@]} - 1 ))
+}
+
 # Waits for the command to succeed in the given interval
-wait_for() {
+# Call with:
+#   now_wait_for TIMEOUT CMD...
+now_wait_for() {
     local t=$1; shift
     for _ in $(seq $((t * 10))); do
         "$@" >/dev/null 2>&1 && return 0
@@ -39,7 +51,9 @@ wait_for() {
 }
 
 # Terminates all processes started with `start`
-stop_all() {
+# Call with:
+#   _now_stop_all
+_now_stop_all() {
     trap - INT TERM EXIT
     for ((i=${#_pids[@]} - 1; i >= 0; i--)); do
         kill -TERM "${_pids[i]}" 2>/dev/null
@@ -48,19 +62,36 @@ stop_all() {
 }
 
 # Exits when any child process ends
-wait_for_jobs() {
-    local pid rc name="<unknown>"
-    wait -n -p pid "${_pids[@]}"
-    rc=$?
+# Call with:
+#   now_wait_for_jobs
+now_wait_for_jobs() {
+    local pid= rc=0
+    wait -n -p pid "${_pids[@]}" || rc=$?
     for i in "${!_pids[@]}"; do
         if [[ ${_pids[i]} == "$pid" ]]; then
-            name=${_names[i]}
-            break
+            echo "Process '${_names[i]}' exited (status $rc); shutting down..."
+            return $rc
         fi
     done
-    echo "Process '$name' exited (status $rc); shutting down"
-    return $rc
 }
 
-trap 'stop_all; exit 130' INT TERM
-trap stop_all EXIT
+# Restarts any child process that terminates
+# Call with:
+#   now_wait_and_restart
+now_wait_and_restart() {
+    local pid= rc=0
+    while true; do
+        wait -n -p pid "${_pids[@]}" || rc=$?
+        for i in "${!_pids[@]}"; do
+            if [[ ${_pids[i]} == "$pid" ]]; then
+                echo "Process '${_names[i]}' exited (status $rc); restarting..."
+                sleep 1
+                _now_spawn "$i"
+                break
+            fi
+        done
+    done
+}
+
+trap '_now_stop_all; exit 130' INT TERM
+trap _now_stop_all EXIT

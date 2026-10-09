@@ -39,23 +39,23 @@
 
   result = promise (
     { options }:
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     let
       package = if options ? package then options.package else pkgs.garage_2;
-      inherit (pkgs.lib) escapeShellArgs;
+      inherit (lib) escapeShellArgs;
     in
     {
       inherit (options) env;
       path = [ package ];
       sandbox.enable = false;
       run = ''
-        set -euo pipefail
+        set -eo pipefail
         source ${./lib.sh}
 
-        start garage garage server ${escapeShellArgs options.args}
-        wait_for 30 garage status
+        now_start garage garage server ${escapeShellArgs options.args}
+        now_wait_for 30 garage status
         echo "Garage is running."
-        wait_for_jobs
+        now_wait_for_jobs
       '';
     }
   );
