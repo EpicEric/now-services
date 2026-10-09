@@ -20,6 +20,8 @@
   ...
 }:
 {
+  inputs.specialArgs.from = { parent }: parent.specialArgs;
+
   options = {
     env = {
       type = types.attrs;
@@ -62,9 +64,9 @@
   ];
 
   result = promise (
-    { options }:
-    { lib, ... }:
+    { inputs, options }:
     let
+      inherit (inputs.specialArgs.specialArgs) lib;
       inherit (builtins) concatStringsSep;
       inherit (lib) optionals escapeShellArg escapeShellArgs;
       nowArgs = escapeShellArgs options.nowArgs;

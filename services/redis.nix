@@ -20,6 +20,8 @@
   ...
 }:
 {
+  inputs.specialArgs.from = { parent }: parent.specialArgs;
+
   options = {
     env = {
       type = types.attrs;
@@ -49,9 +51,9 @@
   };
 
   result = promise (
-    { options }:
-    { pkgs, ... }:
+    { inputs, options }:
     let
+      inherit (inputs.specialArgs.specialArgs) pkgs;
       package = if options ? package then options.package else pkgs.redis;
       serverBinary =
         if options ? serverBinary then options.serverBinary else package.serverBin or "redis-server";

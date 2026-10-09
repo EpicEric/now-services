@@ -20,6 +20,8 @@
   ...
 }:
 {
+  inputs.specialArgs.from = { parent }: parent.specialArgs;
+
   options = {
     env = {
       type = types.attrs;
@@ -41,9 +43,9 @@
   };
 
   result = promise (
-    { options }:
-    { pkgs, lib, ... }:
+    { inputs, options }:
     let
+      inherit (inputs.specialArgs.specialArgs) lib pkgs;
       package' = if options ? package then options.package else pkgs.postgresql;
       inherit (lib) escapeShellArg;
     in

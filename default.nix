@@ -15,13 +15,22 @@
 # with this program. If not, see <https://www.gnu.org/licenses/>.
 
 let
+  inherit (builtins) mapAttrs;
   inputs = import ./.tack;
   adios = import inputs.adios;
-  root.modules = adios.lib.importModules {
-    directory = ./services;
-    args = adios;
-  };
-  tree = adios root { };
+  services = adios.lib.importModules { directory = ./services; };
 in
 
-tree.modules
+mapAttrs (
+  name: value: args: specialArgs:
+  (adios {
+    modules = {
+      specialArgs.options.specialArgs = {
+        type = adios.types.attrs;
+        default = specialArgs;
+      };
+      ${name} = value;
+    };
+  } { }).modules.${name}
+    args
+) services
