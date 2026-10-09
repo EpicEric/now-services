@@ -18,19 +18,11 @@ let
   inherit (builtins) mapAttrs;
   inputs = import ./.tack;
   adios = import inputs.adios;
-  services = adios.lib.importModules { directory = ./services; };
+  root.modules = adios.lib.importModules { directory = ./services; };
+  tree = adios root;
 in
 
 mapAttrs (
   name: value: args: specialArgs:
-  (adios {
-    modules = {
-      specialArgs.options.specialArgs = {
-        type = adios.types.attrs;
-        default = specialArgs;
-      };
-      ${name} = value;
-    };
-  } { }).modules.${name}
-    args
-) services
+  (tree { options."/specialArgs" = { inherit (specialArgs) pkgs lib; }; }).modules.${name} args
+) root.modules

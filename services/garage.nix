@@ -42,7 +42,7 @@
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs.specialArgs) lib pkgs;
+      inherit (inputs.specialArgs) lib pkgs;
       package = if options ? package then options.package else pkgs.garage_2;
       inherit (lib) escapeShellArgs;
     in

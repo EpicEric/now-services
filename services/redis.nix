@@ -53,7 +53,7 @@
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs.specialArgs) pkgs;
+      inherit (inputs.specialArgs) pkgs;
       package = if options ? package then options.package else pkgs.redis;
       serverBinary =
         if options ? serverBinary then options.serverBinary else package.serverBin or "redis-server";

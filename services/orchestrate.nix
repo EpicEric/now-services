@@ -66,7 +66,7 @@
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs.specialArgs) lib;
+      inherit (inputs.specialArgs) lib;
       inherit (builtins) concatStringsSep;
       inherit (lib) optionals escapeShellArg escapeShellArgs;
       nowArgs = escapeShellArgs options.nowArgs;

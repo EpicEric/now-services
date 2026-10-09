@@ -45,7 +45,7 @@
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs.specialArgs) lib pkgs;
+      inherit (inputs.specialArgs) lib pkgs;
       package' = if options ? package then options.package else pkgs.postgresql;
       inherit (lib) escapeShellArg;
     in
