@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <https://www.gnu.org/licenses/>.
 
+{ pkgs, lib, ... }:
+
 let
-  inherit (builtins) mapAttrs;
   inputs = import ./.tack;
   adios = import inputs.adios;
   root.modules = adios.lib.importModules { directory = ./services; };
-  tree = adios root;
+  tree = adios root { options."/specialArgs" = { inherit pkgs lib; }; };
 in
 
-mapAttrs (
-  name: value: args: specialArgs:
-  (tree { options."/specialArgs" = { inherit (specialArgs) pkgs lib; }; }).modules.${name} args
-) root.modules
+tree.modules

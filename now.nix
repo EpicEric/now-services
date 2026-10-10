@@ -1,6 +1,9 @@
-{ runner, ... }:
+{ runner, lib, ... }:
 let
-  services = import ./.;
+  services = import ./. {
+    pkgs = import <nixpkgs> { };
+    inherit lib;
+  };
   now = import (import ./.tack).now { system = builtins.currentSystem; };
 in
 {
