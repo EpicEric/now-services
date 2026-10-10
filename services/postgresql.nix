@@ -20,7 +20,7 @@
   ...
 }:
 {
-  inputs.specialArgs.from = { parent }: parent.specialArgs;
+  inputs.specialArgs.from = { self }: self.specialArgs;
 
   options = {
     env = {
@@ -42,10 +42,25 @@
     };
   };
 
+  modules = {
+    specialArgs = {
+      options = {
+        specialArgs = {
+          type =
+            (types.struct "specialArgs" {
+              lib = types.attrs;
+              pkgs = types.attrs;
+            }).override
+              { unknown = true; };
+        };
+      };
+    };
+  };
+
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs) lib pkgs;
+      inherit (inputs.specialArgs.specialArgs) lib pkgs;
       package' = if options ? package then options.package else pkgs.postgresql;
       inherit (lib) escapeShellArg;
     in

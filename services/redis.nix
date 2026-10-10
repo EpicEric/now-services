@@ -20,7 +20,7 @@
   ...
 }:
 {
-  inputs.specialArgs.from = { parent }: parent.specialArgs;
+  inputs.specialArgs.from = { self }: self.specialArgs;
 
   options = {
     env = {
@@ -50,10 +50,24 @@
     };
   };
 
+  modules = {
+    specialArgs = {
+      options = {
+        specialArgs = {
+          type =
+            (types.struct "specialArgs" {
+              pkgs = types.attrs;
+            }).override
+              { unknown = true; };
+        };
+      };
+    };
+  };
+
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs) pkgs;
+      inherit (inputs.specialArgs.specialArgs) pkgs;
       package = if options ? package then options.package else pkgs.redis;
       serverBinary =
         if options ? serverBinary then options.serverBinary else package.serverBin or "redis-server";

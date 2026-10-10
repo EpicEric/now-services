@@ -20,7 +20,7 @@
   ...
 }:
 {
-  inputs.specialArgs.from = { parent }: parent.specialArgs;
+  inputs.specialArgs.from = { self }: self.specialArgs;
 
   options = {
     env = {
@@ -56,6 +56,20 @@
     };
   };
 
+  modules = {
+    specialArgs = {
+      options = {
+        specialArgs = {
+          type =
+            (types.struct "specialArgs" {
+              lib = types.attrs;
+            }).override
+              { unknown = true; };
+        };
+      };
+    };
+  };
+
   assertions = [
     {
       verify = { options }: builtins.length options.jobs > 0;
@@ -66,7 +80,7 @@
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs) lib;
+      inherit (inputs.specialArgs.specialArgs) lib;
       inherit (builtins) concatStringsSep;
       inherit (lib) optionals escapeShellArg escapeShellArgs;
       nowArgs = escapeShellArgs options.nowArgs;
@@ -76,7 +90,7 @@
       path = optionals (options.package != null) [ options.package ];
       sandbox.enable = false;
       run = ''
-        set -euo pipefail
+        set -eo pipefail
         source ${./lib.sh}
 
         ${concatStringsSep "\n" (

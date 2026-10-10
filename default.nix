@@ -24,5 +24,5 @@ in
 
 mapAttrs (
   name: value: args: specialArgs:
-  (tree { options."/specialArgs" = { inherit (specialArgs) pkgs lib; }; }).modules.${name} args
+  (tree { options."/${name}/specialArgs" = { inherit specialArgs; }; }).modules.${name} args
 ) root.modules
