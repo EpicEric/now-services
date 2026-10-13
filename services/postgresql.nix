@@ -25,7 +25,6 @@
   options = {
     env = {
       type = types.attrs;
-      default = { };
       description = "`now` environment for this step.";
     };
     package = {
@@ -62,10 +61,10 @@
     let
       inherit (inputs.specialArgs.specialArgs) lib pkgs;
       package' = if options ? package then options.package else pkgs.postgresql;
-      inherit (lib) escapeShellArg;
+      inherit (lib) optionalAttrs escapeShellArg;
     in
     {
-      inherit (options) env;
+      env = optionalAttrs (options ? env) options.env;
       path = [
         package'
         pkgs.mktemp

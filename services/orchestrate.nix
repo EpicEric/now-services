@@ -25,25 +25,32 @@
   options = {
     env = {
       type = types.attrs;
-      default = { };
       description = "`now` environment for this step.";
     };
     package = {
-      type = types.nullOr types.derivation;
+      type = types.derivation;
       description = ''
         `now` package to use.
 
-        By default, `now` in your PATH is used.
+        By default, the one in your PATH is used.
       '';
     };
     strategy = {
-      type = types.enum "strategy" [
+      type = types.enum "strategyEnum" [
         "ignore"
         "restart"
         "terminate"
       ];
       default = "terminate";
-      description = "How to handle any failing job.";
+      description = ''
+        How to handle any failing job.
+
+        Possible options:
+
+        - `"terminate"`: Terminate all other jobs.
+        - `"restart"`: Restart any failing jobs.
+        - `"ignore"`: Ignore the failing job and keep going.
+      '';
     };
     jobs = {
       type = types.listOf types.string;
@@ -51,7 +58,6 @@
     };
     nowArgs = {
       type = types.listOf types.string;
-      default = [ ];
       description = "List of common arguments to pass to each invocation of `now run`.";
     };
   };
@@ -82,12 +88,17 @@
     let
       inherit (inputs.specialArgs.specialArgs) lib;
       inherit (builtins) concatStringsSep;
-      inherit (lib) optionals escapeShellArg escapeShellArgs;
-      nowArgs = escapeShellArgs options.nowArgs;
+      inherit (lib)
+        optionals
+        optionalAttrs
+        escapeShellArg
+        escapeShellArgs
+        ;
+      nowArgs = escapeShellArgs (optionals (options ? nowArgs) options.nowArgs);
     in
     {
-      inherit (options) env;
-      path = optionals (options.package != null) [ options.package ];
+      env = optionalAttrs (options ? env) options.env;
+      path = optionals (options ? package) [ options.package ];
       sandbox.enable = false;
       run = ''
         set -eo pipefail
@@ -108,8 +119,10 @@
             "now_wait_for_jobs"
           else if options.strategy == "restart" then
             "now_wait_and_restart"
-          else
+          else if options.strategy == "ignore" then
             "wait"
+          else
+            ""
         }
       '';
     }

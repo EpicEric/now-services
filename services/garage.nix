@@ -25,7 +25,6 @@
   options = {
     env = {
       type = types.attrs;
-      default = { };
       description = "`now` environment for this step.";
     };
     package = {
@@ -34,7 +33,6 @@
     };
     args = {
       type = types.listOf types.string;
-      default = [ ];
       description = "Command-line arguments passed to Garage.";
     };
   };
@@ -59,10 +57,10 @@
     let
       inherit (inputs.specialArgs.specialArgs) lib pkgs;
       package = if options ? package then options.package else pkgs.garage_2;
-      inherit (lib) escapeShellArgs;
+      inherit (lib) optionalAttrs escapeShellArgs;
     in
     {
-      inherit (options) env;
+      env = optionalAttrs (options ? env) options.env;
       path = [ package ];
       sandbox.enable = false;
       run = ''

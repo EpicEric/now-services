@@ -25,7 +25,6 @@
   options = {
     env = {
       type = types.attrs;
-      default = { };
       description = "`now` environment for this step.";
     };
     package = {
@@ -57,6 +56,7 @@
           type =
             (types.struct "specialArgs" {
               pkgs = types.attrs;
+              lib = types.attrs;
             }).override
               { unknown = true; };
         };
@@ -67,7 +67,8 @@
   result = promise (
     { inputs, options }:
     let
-      inherit (inputs.specialArgs.specialArgs) pkgs;
+      inherit (inputs.specialArgs.specialArgs) pkgs lib;
+      inherit (lib) optionalAttrs;
       package = if options ? package then options.package else pkgs.redis;
       serverBinary =
         if options ? serverBinary then options.serverBinary else package.serverBin or "redis-server";
@@ -75,7 +76,7 @@
         if options ? cliBinary then options.cliBinary else package.meta.mainProgram or "redis-cli";
     in
     {
-      inherit (options) env;
+      env = optionalAttrs (options ? env) options.env;
       path = [ package ];
       sandbox.enable = false;
       run = ''
