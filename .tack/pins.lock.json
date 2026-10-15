@@ -3,24 +3,16 @@
     "type": "github",
     "owner": "llakala",
     "repo": "lladios",
-    "rev": "4a5e900239bc2248cd7620954090df5b4fe52b4b",
-    "narHash": "sha256-GhUB1h01JtCY9xgqFXch5TDTQMwNqryJuwJa+9A8zBI=",
-    "lastModified": 1790988501
-  },
-  "nixpkgs": {
-    "type": "github",
-    "owner": "NixOS",
-    "repo": "nixpkgs",
-    "rev": "39ad350a0602fa0a58a544344e3e9187526ea45c",
-    "narHash": "sha256-o0N4g6uSOIppU7CGToNvGlMf5vC+B6O6ukFHKY/TKOY=",
-    "lastModified": 1791366222
+    "rev": "ad44a296b00f5eae1ab8ca51d87d79cb20e19def",
+    "narHash": "sha256-SfwDKg5ByyqyiqWMlZedKt/qQSaj+jjkY1W5BC58qgg=",
+    "lastModified": 1792097632
   },
   "now": {
     "type": "git",
     "url": "https://codeberg.org/now-runner/now.git",
     "ref": "HEAD",
-    "rev": "3a2927380e8bd39f2d27dda7d78d22c27ceb8d96",
-    "narHash": "sha256-WxDqxjZj0NeQ6ezFi8B58YFqrrQy41RvsXzUEwq8iaU=",
-    "lastModified": 1791662925
+    "rev": "4ec9322f3ecee19355d64e3bf90c919a9b4ae98b",
+    "narHash": "sha256-y/z+dyjZXIC3SjAXhx2466SNkMmg5GGOsoInz8GeFqY=",
+    "lastModified": 1792102897
   }
 }

@@ -5,10 +5,6 @@ recomposable = true
 url = "github:llakala/lladios"
 type = "fetch"
 
-[inputs.nixpkgs]
-url = "github:NixOS/nixpkgs/nixpkgs-unstable"
-type = "fetch"
-
 [inputs.now]
 url = "git+https://codeberg.org/now-runner/now.git"
 type = "fetch"

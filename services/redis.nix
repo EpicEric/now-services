@@ -49,20 +49,12 @@
     };
   };
 
-  modules = {
-    specialArgs = {
-      options = {
-        specialArgs = {
-          type =
-            (types.struct "specialArgs" {
-              pkgs = types.attrs;
-              lib = types.attrs;
-            }).override
-              { unknown = true; };
-        };
-      };
-    };
-  };
+  modules.specialArgs.options.specialArgs.type =
+    (types.struct "specialArgs" {
+      lib = types.attrs;
+      pkgs = types.attrs;
+    }).override
+      { unknown = true; };
 
   result = promise (
     { inputs, options }:

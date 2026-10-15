@@ -62,19 +62,11 @@
     };
   };
 
-  modules = {
-    specialArgs = {
-      options = {
-        specialArgs = {
-          type =
-            (types.struct "specialArgs" {
-              lib = types.attrs;
-            }).override
-              { unknown = true; };
-        };
-      };
-    };
-  };
+  modules.specialArgs.options.specialArgs.type =
+    (types.struct "specialArgs" {
+      lib = types.attrs;
+    }).override
+      { unknown = true; };
 
   assertions = [
     {
