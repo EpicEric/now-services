@@ -23,7 +23,11 @@ _pids=()
 #   _now_spawn INDEX
 _now_spawn() {
     local i=$1 name=${_names[$1]}
-    eval "${_commands[i]}" > >(sed -u "s/^/\x1B[2m$name>\x1B[0m /") 2>&1 &
+    if [ -n "$name" ]; then
+        eval "${_commands[i]}" > >(sed -u "s/^/\x1B[2m$name>\x1B[0m /") 2>&1 &
+    else
+        eval "${_commands[i]}" 2>&1 &
+    fi
     _pids[i]=$!
 }
 

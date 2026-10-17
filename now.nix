@@ -54,7 +54,7 @@ in
 
     # Redis
     redis = { pkgs, ... }: {
-      steps = [ (services.redis { package = pkgs.redis; }) ];
+      steps = [ (services.redis { package = pkgs.valkey; }) ];
     };
     test-redis = {
       steps = [

@@ -102,7 +102,7 @@
             let
               job = escapeShellArg job';
             in
-            "now_start ${job} now run ${job} ${nowArgs}"
+            "now_start \"\" now run ${job} ${nowArgs}"
           ) options.jobs
         )}
 
