@@ -22,11 +22,12 @@ _pids=()
 # Call with:
 #   _now_spawn INDEX
 _now_spawn() {
-    local i=$1 name=${_names[$1]}
+    local i=$1 name=${_names[$1]} esc=$'\e'
     if [ -n "$name" ]; then
-        eval "${_commands[i]}" > >(sed -u "s/^/\x1B[2m$name>\x1B[0m /") 2>&1 &
+        eval "exec ${_commands[i]}" \
+            > >(trap '' INT TERM; exec sed -u "s/^/${esc}[2m$name>${esc}[0m /") 2>&1 &
     else
-        eval "${_commands[i]}" 2>&1 &
+        eval "exec ${_commands[i]}" 2>&1 &
     fi
     _pids[i]=$!
 }
@@ -56,12 +57,15 @@ now_wait_for() {
 
 # Terminates all processes started with `start`
 # Call with:
-#   _now_stop_all
+#   _now_stop_all [forward|wait-only]
 _now_stop_all() {
+    local mode=${1:-forward}
     trap - INT TERM EXIT
-    for ((i=${#_pids[@]} - 1; i >= 0; i--)); do
-        kill -TERM "${_pids[i]}" 2>/dev/null
-    done
+    if [ "$mode" = forward ]; then
+        for ((i=${#_pids[@]} - 1; i >= 0; i--)); do
+            kill -TERM "${_pids[i]}" 2>/dev/null && wait "${_pids[i]}" 2>/dev/null
+        done
+    fi
     wait
 }
 
@@ -83,8 +87,9 @@ now_wait_for_jobs() {
 # Call with:
 #   now_wait_and_restart
 now_wait_and_restart() {
-    local pid= rc=0
+    local pid= rc
     while true; do
+        rc=0
         wait -n -p pid "${_pids[@]}" || rc=$?
         for i in "${!_pids[@]}"; do
             if [[ ${_pids[i]} == "$pid" ]]; then
@@ -97,5 +102,6 @@ now_wait_and_restart() {
     done
 }
 
-trap '_now_stop_all; exit 130' INT TERM
+trap '_now_stop_all wait-only; exit 130' INT
+trap '_now_stop_all wait-only; exit 143' TERM
 trap _now_stop_all EXIT
